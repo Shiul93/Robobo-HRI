@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.speech.tts.Voice;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -25,76 +28,152 @@ import framework.robobo.mytechia.com.hri.speech.production.VoiceNotFoundExceptio
  * Created by luis on 5/4/16.
  */
 public class AndroidSpeechProductionModule implements ISpeechProductionModule {
+    //TODO: Podria añadirse un metodo para cambiar lenguaje
     private TextToSpeech tts = null;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private Locale loc = null;
+
 
     @Override
+    /**
+     * Says a text through the phone speaker
+     * @param text The text to be said
+     */
     public void sayText(String text) {
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+
+        } else{
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+
+        }
     }
 
     @Override
     /**
      *  Sets the current voice of the text to speech generator
      *  @param name The name of the voice to use
-     *  @throws VoiceNotFoundException
+     *  @throws VoiceNotFoundException, UnsupportedOperationException
      */
-    public void selectVoice(String name) throws VoiceNotFoundException{
+    public void selectVoice(String name) throws VoiceNotFoundException, UnsupportedOperationException{
 
-        Voice v = null;
-        Collection<Voice> voices = tts.getVoices();
-        //Iterate over the collection searching for the required voice
-        for (Voice vo : voices) {
-            if (vo.getName().equals(name)){
-                v = vo;
+        //Check if the android version of the device supports voices for the tts
+
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+            //Iterate over the voices and if the desired voice is found, set it in the tts object
+
+            Voice v = null;
+            Collection<Voice> voices = null;
+
+            voices = tts.getVoices();
+
+            //Iterate over the collection searching for the required voice
+            for (Voice vo : voices) {
+                if (vo.getName().equals(name)){
+                    v = vo;
+                }
             }
+
+            //Throw exception if no suitable voice is found
+            if (v == null){
+                Log.e("TTS","Error: voice "+name+"not found");
+                throw new VoiceNotFoundException("Voice "+name+" not found");
+
+
+            }
+
+            tts.setVoice(v);
+        } else{
+            //TODO Mirar a ver que se hace con esto, ¿Objeto voz por defecto?
+            throw new UnsupportedOperationException(
+                    "Selecting voices is not supported for this " +
+                            "Android version, minimum api level 21"
+            );
+
         }
 
-        //Throw exception if no suitable voice is found
-        if (v == null){
-            throw new VoiceNotFoundException("Voice "+name+" not found");
-        }
-
-        tts.setVoice(v);
 
     }
 
     @Override
     /**
      *  Returns a collection of the available voices for text to speech
-     *  @return The voice collection
+     *  @return A collection of the available voices names
+     *  @throws UnsupportedOperationException
      */
-    public Collection<String> getVoices() {
+    public Collection<String> getVoices() throws  UnsupportedOperationException{
 
-        Collection<Voice> voices = tts.getVoices();
+
+
         Collection<String> results = new ArrayList<String>();
-        for (Voice v : voices) {
-           results.add(v.getName());
+
+
+
+
+        //Check if the android version of the device supports voices for the tts
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+            Collection<Voice> voices = tts.getVoices();
+            for (Voice v : voices) {
+                results.add(v.getName());
+            }
+            return results;
+        } else{
+            //TODO: Comprobar que hay dentro del features
+            //TODO Mirar a ver que se hace con esto, ¿Objeto voz por defecto?
+            //Locale locale = tts.getLanguage();
+            //Set<String> features = tts.getFeatures(locale);
+            //String[] featureArray = new String[features.size()];
+            //features.toArray(featureArray);
+
+            //Throw a exception for earlier versions of the api which don't support voices
+            throw new UnsupportedOperationException(
+                    "Selecting voices is not supported for this " +
+                            "Android version, minimum api level 21"
+            );
         }
-        return results;
+
+
+
+        /*
+        */
+
+
 
     }
 
     @Override
+    /**
+     *  Starts the TextToSpeech engine
+     *  @param frameworkManager instance of the Robobo framework manager
+     *  @throws InternalErrorException
+     */
+    //TODO Igual estaba bien pasarle el locale de alguna forma (Por defecto el ingles)
     public void startup(FrameworkManager frameworkManager) throws InternalErrorException {
         Context context = null; //Provisional a espera de recibirlo del manager
-
+        loc = Locale.UK;
+        //Creación del objeto Text to Speech
         tts = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
+
+                tts.setLanguage(loc);
             }
+
         }
         );
-        Locale spanish = new Locale("es", "ES");
-        tts.setLanguage(spanish);
+        tts.setOnUtteranceProgressListener(new TtsUtteranceListener());
+
     }
 
     @Override
+    /**
+     * Stops the TextTOSpeech engine and frees the resources
+     * @throws InternalErrorException
+     */
     public void shutdown() throws InternalErrorException {
+        //Liberación de recursos del text to speech
+        tts.shutdown();
 
     }
 
