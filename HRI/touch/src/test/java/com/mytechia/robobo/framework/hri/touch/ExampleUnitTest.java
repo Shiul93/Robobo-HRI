@@ -1,4 +1,4 @@
-package com.mytechia.robobo.com.hri;
+package com.mytechia.robobo.framework.hri.touch;
 
 import org.junit.Test;
 

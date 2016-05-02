@@ -1,0 +1,9 @@
+up /1.0/
+down /1.0/
+left /1.0/
+right /1.0/
+forwards /1e-1/
+robobo /1.0/
+robot /1.0/
+talk /1.0/
+say /1.0/
