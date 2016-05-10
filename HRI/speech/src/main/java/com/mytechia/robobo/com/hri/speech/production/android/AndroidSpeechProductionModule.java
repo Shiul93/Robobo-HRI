@@ -19,24 +19,42 @@ import com.mytechia.robobo.com.hri.speech.production.VoiceNotFoundException;
  * Created by luis on 5/4/16.
  */
 public class AndroidSpeechProductionModule implements ISpeechProductionModule {
-    //TODO: Podria añadirse un metodo para cambiar lenguaje(AÑADIR)
+
     private TextToSpeech tts = null;
     private Locale loc = null;
+    private Context context = null;
 
 
     @Override
     /**
      * Says a text through the phone speaker
      * @param text The text to be said
+     * @param priority The priority of the phrase, ISpeechProductionModule.PRIORITY_HIGH / LOW
      */
-    public void sayText(String text) {
+    public void sayText(String text, Integer priority) {
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+       /* if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
 
         } else{
             tts.speak(text, TextToSpeech.QUEUE_ADD, null);
 
+        }*/
+        if (priority == ISpeechProductionModule.PRIORITY_HIGH){
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+        }else
+        if (priority == ISpeechProductionModule.PRIORITY_LOW){
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
         }
+    }
+
+    /**
+     * Sets a new locale for the Text To Speech object
+     * @param newloc
+     */
+    public void setLocale(Locale newloc){
+        //TODO: Podria añadirse un metodo para cambiar lenguaje
+        loc = newloc;
+        tts.setLanguage(loc);
     }
 
     @Override
@@ -54,9 +72,9 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
             //Iterate over the voices and if the desired voice is found, set it in the tts object
 
             Voice v = null;
-            Collection<Voice> voices = null;
+            Collection<Voice> voices = tts.getVoices();
 
-            voices = tts.getVoices();
+
 
             //Iterate over the collection searching for the required voice
             for (Voice vo : voices) {
@@ -86,13 +104,36 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
     }
 
+    public void selectTtsVoice(TtsVoice voice) throws VoiceNotFoundException, UnsupportedOperationException{
+
+        //Check if the android version of the device supports voices for the tts
+
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+            //Iterate over the voices and if the desired voice is found, set it in the tts object
+
+
+
+            tts.setVoice(voice.getInternalVoice());
+        } else{
+            //TODO Mirar a ver que se hace con esto, ¿Objeto voz por defecto?
+            throw new UnsupportedOperationException(
+                    "Selecting voices is not supported for this " +
+                            "Android version, minimum api level 21"
+            );
+
+        }
+
+
+    }
+
     @Override
     /**
      *  Returns a collection of the available voices for text to speech
      *  @return A collection of the available voices names
      *  @throws UnsupportedOperationException
      */
-    public Collection<String> getVoices() throws  UnsupportedOperationException{
+    public Collection<String> getStringVoices() throws  UnsupportedOperationException{
 
 
 
@@ -133,6 +174,40 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
     }
 
+    public Collection<TtsVoice> getVoices() throws  UnsupportedOperationException{
+
+
+        //TODO Duda: ¿Generar la lista de voces al crear el tts?
+        Collection<TtsVoice> results = new ArrayList<TtsVoice>();
+
+
+
+
+        //Check if the android version of the device supports voices for the tts
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP){
+            Collection<Voice> voices = tts.getVoices();
+            for (Voice v : voices) {
+                TtsVoice ttsV = new TtsVoice(v);
+                results.add(ttsV);
+            }
+            return results;
+        } else{
+            //Returns the default voice
+            Locale locale = tts.getLanguage();
+            results.add(new TtsVoice((locale)));
+           return  results;
+        }
+
+
+
+        /*
+        */
+
+
+
+    }
+
     @Override
     /**
      *  Starts the TextToSpeech engine
@@ -141,9 +216,12 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
      */
     //TODO Igual estaba bien pasarle el locale de alguna forma (Por defecto el ingles)
     public void startup(FrameworkManager frameworkManager) throws InternalErrorException {
-        Context context = null; //Provisional a espera de recibirlo del manager
+        context = frameworkManager.getApplicationContext();
+
+        //Default language, English
         loc = Locale.UK;
-        //Creación del objeto Text to Speech
+
+        //Creation the TTS object
         tts = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -153,7 +231,28 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
         }
         );
-        tts.setOnUtteranceProgressListener(new TtsUtteranceListener());
+        //tts.setOnUtteranceProgressListener(new TtsUtteranceListener());
+
+    }
+
+    //TODO Igual estaba bien pasarle el locale de alguna forma (Por defecto el ingles)
+    public void startupTest(Context co) throws InternalErrorException {
+        context = co;
+
+        //Default language, English
+        loc = Locale.UK;
+
+        //Creation the TTS object
+        tts = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+
+                tts.setLanguage(loc);
+            }
+
+        }
+        );
+       // tts.setOnUtteranceProgressListener(new TtsUtteranceListener());
 
     }
 
