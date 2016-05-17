@@ -15,8 +15,23 @@ public interface ISpeechProductionModule extends IModule {
 
 
     void sayText(String text, Integer priority);
+    /**
+     *  Sets the current voice of the text to speech generator
+     *  @param name The name of the voice to use
+     *  @throws VoiceNotFoundException, UnsupportedOperationException
+     */
     void selectVoice(String name) throws Exception;
+    /**
+     *  Sets the current voice of the text to speech generator
+     *  @param voice The  voice to use
+     *  @throws VoiceNotFoundException, UnsupportedOperationException
+     */
     void selectTtsVoice(TtsVoice voice) throws Exception;
     Collection<TtsVoice> getVoices();
+    /**
+     *  Returns a collection of the available voices for text to speech
+     *  @return A collection of the available voices names
+     *  @throws UnsupportedOperationException
+     */
     Collection<String> getStringVoices();
 }

@@ -6,14 +6,21 @@ import com.mytechia.commons.framework.exception.InternalErrorException;
 import com.mytechia.robobo.framework.FrameworkManager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.AbstractCollection;
 import java.util.HashSet;
 
-import edu.cmu.pocketsphinx.*;
+
+
 
 import com.mytechia.robobo.com.hri.speech.recognition.ASpeechRecognitionModule;
 import com.mytechia.robobo.com.hri.speech.recognition.ISpeechRecognitionListener;
+
+import edu.cmu.pocketsphinx.Hypothesis;
+import edu.cmu.pocketsphinx.RecognitionListener;
+import edu.cmu.pocketsphinx.SpeechRecognizer;
 
 import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 
@@ -21,15 +28,26 @@ import static edu.cmu.pocketsphinx.SpeechRecognizerSetup.defaultSetup;
 /**
  * Created by luis on 5/4/16.
  */
-public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModule implements ISpeechRecognitionListener {
+public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModule implements RecognitionListener {
 
     private SpeechRecognizer recognizer;
+    private static final String PHRASEFILENAME = "phrases.txt";
 
-    private static final String KEYPHRASE = "hey robobo";
+    private static final String KEYWORDSEARCH = "KWSEARCH";
     private AbstractCollection<String> recognizablePhrases;
     private static final Integer HASHSETSIZE = 128;
+    private static File appRootDir;
+    private File phraseFile;
+
+    public  PocketSphinxSpeechRecognitionModule(){
+        super();
+    }
 
     @Override
+    /**
+     * Adds a phrase to the collection
+     * @param phrase The phrase to be added
+     */
     public void addPhrase(String phrase) {
         //TODO Las palabras a reconocer van dentro de un archivo .gram
         //TODO ¿Metodo para actualizar este fichero en funcion de la lista de frases?
@@ -39,37 +57,91 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
     }
 
     @Override
+    /**
+     * Removes a phrase from the collection
+     * @param phrase The phrase to be removed
+     */
     public void removePhrase(String phrase) {
 
         if(!recognizablePhrases.remove(phrase)){
             Log.e("PS_SpeechRecognition","Phrase "+phrase+" not found in the recognizable set");
         }
+
+    }
+
+    /**
+     * Updates the pocketsphinx search with the contents of the recognizable phrases collection.
+     * Should be called after addPhrase() and removePhrase()
+     */
+    public void updatePhrases(){
+        PrintWriter writer = null;
+        recognizer.stop();
+
+        try {
+            //Deletes the old file
+            writer = new PrintWriter(phraseFile);
+            writer.print("");
+            writer.close();
+            writer = new PrintWriter(phraseFile);
+            //Iterates over all the current phrases and adds them to the file
+            for (String phrase:recognizablePhrases){
+                writer.append(phrase+"\n");
+            }
+            //Set the keyword search with the new file
+            recognizer.addKeywordSearch(KEYWORDSEARCH,phraseFile);
+        } catch (FileNotFoundException e) {
+            Log.e("PS_SpeechRecognition","Phrase file not initialized");
+            e.printStackTrace();
+
+        }
+        recognizer.startListening(KEYWORDSEARCH);
+
+
+
     }
 
     @Override
+    /**
+     * Clear all the phrases in the recognizer
+     */
     public void cleanPhrases() {
+        //Clear the collection
+        recognizablePhrases.clear();
+        //Update the recognizer
+        updatePhrases();
 
     }
 
     @Override
     public void startup(FrameworkManager frameworkManager) throws InternalErrorException {
+        //Create a new hashset for phrases
         recognizablePhrases = new HashSet<String>(HASHSETSIZE);
+        //Get current directory for the app
+        appRootDir= frameworkManager.getApplicationContext().getFilesDir();
+        //Create a new text file for storing the phrases
+        phraseFile = new File(appRootDir,PHRASEFILENAME);
+        //Update search and start listening
+        updatePhrases();
+
     }
 
     @Override
     public void shutdown() throws InternalErrorException {
+        //Cancel the listening
         recognizer.cancel();
+        //Shutdown the recognizer
         recognizer.shutdown();
+        //Delete the phrase file
+        phraseFile.delete();
+
     }
 
-    @Override
-    public void phraseRecognized(String phrase, Long timestamp) {
-        notifyPhrase(phrase, timestamp);
-    }
 
     private void setupRecognizer(File assetsDir) throws IOException {
         // The recognizer can be configured to perform multiple searches
         // of different kind and switch between them
+
+
 
         recognizer = defaultSetup()
                 .setAcousticModel(new File(assetsDir, "en-us-ptm"))
@@ -85,16 +157,47 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
                 .setBoolean("-allphone_ci", true)
 
                 .getRecognizer();
-        //recognizer.addListener(this);
-
-        /** In your application you might not need to add all those searches.
-         * They are added here for demonstration. You can leave just one.
-         */
-
-        // Create keyword-activation search.
-        //recognizer.addKeyphraseSearch(KWS_SEARCH, KEYPHRASE);
+        recognizer.addListener(this);
 
 
+
+
+
+    }
+
+    @Override
+    public void onBeginningOfSpeech() {
+
+    }
+
+    @Override
+    public void onEndOfSpeech() {
+
+    }
+
+    @Override
+    public void onPartialResult(Hypothesis hypothesis) {
+
+    }
+
+    @Override
+    public void onResult(Hypothesis hypothesis) {
+        if (hypothesis != null) {
+            String text = hypothesis.getHypstr();
+            long time = System.currentTimeMillis();
+            notifyPhrase(text,time);
+        }
+
+
+    }
+
+    @Override
+    public void onError(Exception e) {
+
+    }
+
+    @Override
+    public void onTimeout() {
 
     }
 }

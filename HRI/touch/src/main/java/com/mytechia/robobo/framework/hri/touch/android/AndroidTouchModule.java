@@ -9,6 +9,9 @@ import com.mytechia.robobo.framework.hri.touch.ITouchListener;
  * Created by luis on 5/4/16.
  */
 public class AndroidTouchModule extends ATouchModule {
+    public  AndroidTouchModule(){
+        super();
+    }
     public void startup(FrameworkManager manager){
 
     }
