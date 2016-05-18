@@ -49,7 +49,7 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
     /**
      * Sets a new locale for the Text To Speech object
-     * @param newloc
+     * @param newloc new Locale to set
      */
     public void setLocale(Locale newloc){
         //TODO: Podria añadirse un metodo para cambiar lenguaje
@@ -231,11 +231,11 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
         }
         );
-        //tts.setOnUtteranceProgressListener(new TtsUtteranceListener());
+
 
     }
 
-    //TODO Igual estaba bien pasarle el locale de alguna forma (Por defecto el ingles)
+    //TODO Provisional a espera de saber utilizar el FrameworkManager
     public void startupTest(Context co) throws InternalErrorException {
         context = co;
 
@@ -252,7 +252,7 @@ public class AndroidSpeechProductionModule implements ISpeechProductionModule {
 
         }
         );
-       // tts.setOnUtteranceProgressListener(new TtsUtteranceListener());
+
 
     }
 

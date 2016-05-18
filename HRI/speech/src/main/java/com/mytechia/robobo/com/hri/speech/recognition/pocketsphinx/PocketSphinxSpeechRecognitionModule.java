@@ -1,5 +1,6 @@
 package com.mytechia.robobo.com.hri.speech.recognition.pocketsphinx;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.mytechia.commons.framework.exception.InternalErrorException;
@@ -18,6 +19,7 @@ import java.util.HashSet;
 import com.mytechia.robobo.com.hri.speech.recognition.ASpeechRecognitionModule;
 import com.mytechia.robobo.com.hri.speech.recognition.ISpeechRecognitionListener;
 
+import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;
@@ -36,7 +38,6 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
     private static final String KEYWORDSEARCH = "KWSEARCH";
     private AbstractCollection<String> recognizablePhrases;
     private static final Integer HASHSETSIZE = 128;
-    private static File appRootDir;
     private File phraseFile;
 
     public  PocketSphinxSpeechRecognitionModule(){
@@ -49,8 +50,7 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
      * @param phrase The phrase to be added
      */
     public void addPhrase(String phrase) {
-        //TODO Las palabras a reconocer van dentro de un archivo .gram
-        //TODO ¿Metodo para actualizar este fichero en funcion de la lista de frases?
+
 
         recognizablePhrases.add(phrase);
 
@@ -114,10 +114,35 @@ public class PocketSphinxSpeechRecognitionModule extends ASpeechRecognitionModul
 
     @Override
     public void startup(FrameworkManager frameworkManager) throws InternalErrorException {
+
         //Create a new hashset for phrases
         recognizablePhrases = new HashSet<String>(HASHSETSIZE);
         //Get current directory for the app
-        appRootDir= frameworkManager.getApplicationContext().getFilesDir();
+        File appRootDir = frameworkManager.getApplicationContext().getFilesDir();
+        //Create a new text file for storing the phrases
+        phraseFile = new File(appRootDir,PHRASEFILENAME);
+        //Update search and start listening
+        updatePhrases();
+
+    }
+
+    public void startupTest(Context context) throws InternalErrorException {
+
+        //Create a new hashset for phrases
+        //TODO Mirar lo de los assets
+
+        recognizablePhrases = new HashSet<String>(HASHSETSIZE);
+        //Assets assets = new Assets(context.this);
+        File assetDir = null;
+        try {
+            //assetDir = assets.syncAssets();
+            setupRecognizer(assetDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Get current directory for the app
+        File appRootDir = context.getFilesDir();
         //Create a new text file for storing the phrases
         phraseFile = new File(appRootDir,PHRASEFILENAME);
         //Update search and start listening
