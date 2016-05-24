@@ -1,5 +1,7 @@
 package com.mytechia.robobo.framework.hri.touch;
 
+import android.util.Log;
+
 import java.util.HashSet;
 
 /**
@@ -33,6 +35,7 @@ public abstract class ATouchModule implements ITouchModule {
         }
     }
     public void suscribe(ITouchListener listener){
+        Log.d("AT_module", "Suscribed:"+listener.toString());
         listeners.add(listener);
     }
     public void unsuscribe(ITouchListener listener){
