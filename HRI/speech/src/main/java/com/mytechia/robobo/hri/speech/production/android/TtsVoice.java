@@ -1,18 +1,17 @@
-package com.mytechia.robobo.com.hri.speech.production.android;
+package com.mytechia.robobo.hri.speech.production.android;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.speech.tts.Voice;
+
+import com.mytechia.robobo.hri.speech.production.ITtsVoice;
 
 import java.util.Locale;
 
 /**
  * Created by luis on 2/5/16.
  */
-public class TtsVoice {
-    //TODO: El nombre puede llevar a equivoco, revisar
-    //Is true if the api is lower than 19
-    public boolean isDefault = true;
+public class TtsVoice implements ITtsVoice{
+
+
     //Voice object to wrap
     private Voice internalVoice = null;
     //Name of the voice
@@ -22,35 +21,22 @@ public class TtsVoice {
     //Name of the language
     private String voiceLanguage = null;
 
-    /**
-     * Constructor for api versions previous to 21
-     */
-    public TtsVoice(Locale newloc){
-        isDefault = true;
-        voiceName = "DefaultVoice";
-        loc = newloc;
-        voiceLanguage = loc.getLanguage();
 
-    }
 
-    /**
-     * Constructor for api versions >= 21
-     * @param vo The voice object to wrap
-     */
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public TtsVoice(Voice vo){
         internalVoice = vo;
         loc = vo.getLocale();
         voiceLanguage = loc.getLanguage();
         voiceName = vo.getName();
-        isDefault = false;
 
     }
 
+    @Override
     public String getVoiceName() {
         return voiceName;
     }
 
+    @Override
     public String getVoiceLanguage() {
         return voiceLanguage;
     }
@@ -59,7 +45,6 @@ public class TtsVoice {
     public String toString() {
         return "TtsVoice{" +
                 "voiceName='" + voiceName + '\'' +
-                ", isDefault=" + isDefault +
                 ", voiceLanguage='" + voiceLanguage + '\'' +
                 '}';
     }

@@ -1,4 +1,4 @@
-package com.mytechia.robobo.com.hri.speech;
+package com.mytechia.robobo.hri.speech;
 
 import org.junit.Test;
 

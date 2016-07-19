@@ -1,4 +1,4 @@
-package com.mytechia.robobo.com.hri.speech.production;
+package com.mytechia.robobo.hri.speech.production;
 
 /**
  * Created by luis on 6/4/16.

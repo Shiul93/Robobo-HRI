@@ -1,4 +1,4 @@
-package com.mytechia.robobo.com.hri.speech;
+package com.mytechia.robobo.hri;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

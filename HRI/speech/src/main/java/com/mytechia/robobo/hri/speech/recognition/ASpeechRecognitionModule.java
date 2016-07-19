@@ -1,4 +1,4 @@
-package com.mytechia.robobo.com.hri.speech.recognition;
+package com.mytechia.robobo.hri.speech.recognition;
 
 
 import java.util.HashSet;

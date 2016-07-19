@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mytechia.robobo.com.hri">
+    package="com.mytechia.robobo.hri">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="com.mytechia.robobo.framework.hri.TouchModuleActivity">
+        <activity android:name="com.mytechia.robobo.framework.hri.MainActivityTTS">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,7 +30,7 @@
 
         <activity android:name="com.mytechia.robobo.framework.hri.PocketSphinxActivity" />
         <activity
-            android:name="com.mytechia.robobo.framework.hri.MainActivityTTS"
+            android:name="com.mytechia.robobo.framework.hri.TouchModuleActivity"
             android:label="@string/title_activity_touch_module"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

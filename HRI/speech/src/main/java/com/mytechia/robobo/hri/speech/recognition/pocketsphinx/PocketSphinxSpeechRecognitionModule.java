@@ -1,10 +1,10 @@
-package com.mytechia.robobo.com.hri.speech.recognition.pocketsphinx;
+package com.mytechia.robobo.hri.speech.recognition.pocketsphinx;
 
 import android.content.Context;
 import android.util.Log;
 
 import com.mytechia.commons.framework.exception.InternalErrorException;
-import com.mytechia.robobo.framework.FrameworkManager;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,10 +16,8 @@ import java.util.HashSet;
 
 
 
-import com.mytechia.robobo.com.hri.speech.recognition.ASpeechRecognitionModule;
-import com.mytechia.robobo.com.hri.speech.recognition.ISpeechRecognitionListener;
+import com.mytechia.robobo.hri.speech.recognition.ASpeechRecognitionModule;
 
-import edu.cmu.pocketsphinx.Assets;
 import edu.cmu.pocketsphinx.Hypothesis;
 import edu.cmu.pocketsphinx.RecognitionListener;
 import edu.cmu.pocketsphinx.SpeechRecognizer;

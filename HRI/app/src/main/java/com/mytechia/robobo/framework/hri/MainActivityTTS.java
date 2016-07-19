@@ -1,6 +1,5 @@
 package com.mytechia.robobo.framework.hri;
 
-import android.annotation.TargetApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,31 +7,42 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.mytechia.commons.framework.exception.InternalErrorException;
-import com.mytechia.robobo.com.hri.R;
-import com.mytechia.robobo.com.hri.speech.production.VoiceNotFoundException;
-import com.mytechia.robobo.com.hri.speech.production.android.AndroidSpeechProductionModule;
-import com.mytechia.robobo.com.hri.speech.production.android.TtsVoice;
-import com.mytechia.robobo.framework.FrameworkManager;
+import com.mytechia.robobo.framework.RoboboManager;
+import com.mytechia.robobo.framework.activity.DefaultRoboboActivity;
+import com.mytechia.robobo.framework.exception.ModuleNotFoundException;
+import com.mytechia.robobo.hri.R;
+import com.mytechia.robobo.hri.speech.production.ITtsVoice;
+import com.mytechia.robobo.hri.speech.production.VoiceNotFoundException;
+import com.mytechia.robobo.hri.speech.production.android.AndroidSpeechProductionModule;
+import com.mytechia.robobo.hri.speech.production.android.TtsVoice;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 public class MainActivityTTS extends AppCompatActivity {
-
+    //TODO MIRAR SI VOZ ESTA DESCARGADA
     int index =0;
     TtsVoice actualVoice = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final AndroidSpeechProductionModule aspm = new AndroidSpeechProductionModule();
+        /*final AndroidSpeechProductionModule aspm = new AndroidSpeechProductionModule();
         try {
             aspm.startupTest(this.getApplicationContext());
         } catch (InternalErrorException e) {
             e.printStackTrace();
+        }*/
+
+
+        AndroidSpeechProductionModule speechM = null;
+        try {
+            speechM = RoboboManager.getInstance().getModuleInstance(AndroidSpeechProductionModule.class);
+        } catch (ModuleNotFoundException e) {
+            e.printStackTrace();
         }
+
+        final AndroidSpeechProductionModule aspm = speechM;
+
         final TextView tv = (TextView) findViewById(R.id.textView);
 
         final EditText inputText = (EditText) findViewById(R.id.editText);
@@ -60,7 +70,7 @@ public class MainActivityTTS extends AppCompatActivity {
 
             nextButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    final Collection<TtsVoice> voiceCol =aspm.getVoices();
+                    final Collection<ITtsVoice> voiceCol =aspm.getVoices();
                     if (index < voiceCol.size()) {
                         index = index + 1;
                     }
@@ -75,7 +85,7 @@ public class MainActivityTTS extends AppCompatActivity {
 
             prevButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    final Collection<TtsVoice> voiceCol =aspm.getVoices();
+                    final Collection<ITtsVoice> voiceCol =aspm.getVoices();
                     if (index != 0) {
                         index = index - 1;
                     }

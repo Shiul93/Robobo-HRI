@@ -1,17 +1,12 @@
 package com.mytechia.robobo.framework.hri;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.RadioButton;
 import android.widget.Toast;
-//TODO: Preguntar como arreglar esto, sobra un.com
-import com.mytechia.robobo.com.hri.R;
+import com.mytechia.robobo.hri.R;
 import com.mytechia.robobo.framework.hri.touch.ITouchListener;
 import com.mytechia.robobo.framework.hri.touch.ITouchModule;
 import com.mytechia.robobo.framework.hri.touch.TouchGestureDirection;
@@ -19,24 +14,24 @@ import com.mytechia.robobo.framework.hri.touch.android.AndroidTouchModule;
 
 import static android.widget.Toast.makeText;
 
-public class TouchModuleActivity extends AppCompatActivity implements ITouchListener {
-    ITouchModule itm;
-    RadioButton rb;
-    boolean toggle;
-    int posx, posy;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_touch_module);
-        rb = (RadioButton) findViewById(R.id.radioButton);
-        itm = new AndroidTouchModule();
-        itm.startupTest(this.getApplicationContext());
-        itm.suscribe(this);
-        posx = (int) rb.getX();
-        posy = (int) rb.getY();
+public class  TouchModuleActivity extends AppCompatActivity implements ITouchListener {
+        ITouchModule itm;
+        RadioButton rb;
+        boolean toggle;
+        int posx, posy;
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_touch_module);
+            rb = (RadioButton) findViewById(R.id.radioButton);
+            itm = new AndroidTouchModule();
+            itm.startupTest(this.getApplicationContext());
+            itm.suscribe(this);
+            posx = (int) rb.getX();
+            posy = (int) rb.getY();
 
 
-    }
+        }
 
     public boolean onTouchEvent(MotionEvent event){
         itm.onTouchEvent(event);

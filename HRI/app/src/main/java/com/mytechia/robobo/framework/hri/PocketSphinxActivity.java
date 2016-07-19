@@ -3,7 +3,7 @@ package com.mytechia.robobo.framework.hri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.mytechia.robobo.com.hri.R;
+import com.mytechia.robobo.hri.hri.R;
 
 public class PocketSphinxActivity extends AppCompatActivity {
 

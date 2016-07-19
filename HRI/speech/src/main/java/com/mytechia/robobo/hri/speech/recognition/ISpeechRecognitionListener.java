@@ -1,4 +1,4 @@
-package com.mytechia.robobo.com.hri.speech.recognition;
+package com.mytechia.robobo.hri.speech.recognition;
 
 /**
  * Created by luis on 5/4/16.
